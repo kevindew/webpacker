@@ -9,12 +9,14 @@ ensure
 end
 
 def enhance_assets_precompile
-  Rake::Task["assets:precompile"].enhance do
-    unless Rake::Task.task_defined?("yarn:install")
+  Rake::Task["assets:precompile"].enhance do |task|
+    prefix = task.name.split(/#|assets:precompile/).first
+
+    unless Rake::Task.task_defined?("#{prefix}yarn:install")
       # For Rails < 5.1
-      Rake::Task["webpacker:yarn_install"].invoke
+      Rake::Task["#{prefix}webpacker:yarn_install"].invoke
     end
-    Rake::Task["webpacker:compile"].invoke
+    Rake::Task["#{prefix}webpacker:compile"].invoke
   end
 end
 

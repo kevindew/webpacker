@@ -22,21 +22,22 @@ end
 
 apply "#{__dir__}/binstubs.rb"
 
-if File.exists?(".gitignore")
-  append_to_file ".gitignore", <<-EOS
-/public/packs
-/public/packs-test
-/node_modules
-yarn-debug.log*
-.yarn-integrity
+gitignore = <<-EOS
+  /public/packs
+  /public/packs-test
+  /node_modules
+  yarn-debug.log*
+  .yarn-integrity
 EOS
+append_to_file ".gitignore", gitignore if File.exists?(Rails.root.join(".gitignore"))
+
+Dir.chdir(Rails.root) do
+  say "Installing all JavaScript dependencies"
+  run "yarn add @rails/webpacker"
+
+  say "Installing dev server for live reloading"
+  run "yarn add --dev webpack-dev-server"
 end
-
-say "Installing all JavaScript dependencies"
-run "yarn add @rails/webpacker"
-
-say "Installing dev server for live reloading"
-run "yarn add --dev webpack-dev-server"
 
 if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR > 1
   say "You need to allow webpack-dev-server host as allowed origin for connect-src.", :yellow
